@@ -72,7 +72,6 @@ class RLGlue:
         self.agents[self.current_agent]["curr_reward"] = reward
         self.agents[self.current_agent]["total_reward"] += reward
         self.switch_players()
-        self.state = state
         return state, terminal, mask
 
     def rl_step(self):

@@ -1,4 +1,49 @@
 import numpy as np
+from keras.models import Sequential
+from keras.layers import Dense, Conv2D, Flatten
+from keras import optimizers
+
+
+class ConvKerasNN():
+    def __init__(self, lr=0.009):
+        self.model = Sequential()
+        self.model.add(Conv2D(9, kernel_size=3, padding='same', activation='sigmoid', input_shape=(3,3,1)))
+        self.model.add(Conv2D(9, kernel_size=3, padding='valid', activation='sigmoid'))
+        self.model.add(Flatten())
+        self.model.add(Dense(9))
+        self.optimizer = optimizers.Adam(lr=lr)
+        self.model.compile(optimizer=self.optimizer,
+                    loss='mean_squared_error',
+                    metrics=['accuracy'])
+
+    def predict(self, input):
+        return self.model.predict(input)
+
+    def train(self, input, target):
+        self.model.fit(input, target, batch_size=1, verbose=0)
+        
+
+class SimpleKerasNN():
+    def __init__(self, layer_sizes, activation_type="sigmoid", lr=0.009):
+        self.layer_sizes = layer_sizes
+         
+        self.model = Sequential()
+        self.model.add(Dense(layer_sizes[1], input_shape=(layer_sizes[0],), activation=activation_type))
+        for i in range(2, len(layer_sizes)):
+            self.model.add(Dense(layer_sizes[i]))
+        
+        self.optimizer = optimizers.Adam(lr=lr)
+        self.model.compile(optimizer=self.optimizer,
+                    loss='mean_squared_error',
+                    metrics=['accuracy'])
+
+
+    def predict(self, input):
+        return self.model.predict(input)
+
+    def train(self, input, target):
+        self.model.fit(input, target, batch_size=1, verbose=0)
+
 
 class SimpleNN():
     """
@@ -20,11 +65,11 @@ class SimpleNN():
         for i in range(0, len(self.layer_sizes) - 1):
             self.inputs.append((a, da))
             W, b = self.weights[i]['W'], self.weights[i]['b']
-            z = np.dot(a, W) + b
-            a = np.maximum(z, 0)
+            z = np.dot(a, W) + b  # linear transformation
+            a = np.maximum(z, 0)  # non linearity
             da = (a > 0).astype(float)
 
-        return z.ravel()
+        return a.ravel()
     
     def get_gradients(self, s, delta_mat):
         v = delta_mat
